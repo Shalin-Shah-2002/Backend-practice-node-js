@@ -3,7 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import userRoutes from './routes/userRoutes.js';
+
 import authRoutes from './routes/authRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -27,7 +27,7 @@ app.get('/swagger.json', (req, res) => {
 
 // Mount routes – auth first (login), then protected user routes
 app.use('/auth', authRoutes);
-app.use('/api/users', userRoutes);
+
 
 // Root endpoint
 app.get('/', (req, res) => {

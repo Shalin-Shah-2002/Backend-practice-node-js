@@ -56,6 +56,7 @@ There is no stable product direction yet. This repository is intentionally open-
 ## Project Structure
 
 - `controllers/` - request handlers and business logic
+- `models/` - Prisma-backed data access layer
 - `routes/` - API route definitions
 - `middleware/` - auth and request middleware
 - `docs/` - Swagger and API documentation files
