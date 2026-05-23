@@ -9,7 +9,7 @@ This document enumerates all REST endpoints required for the **Backend‑Practic
 | Method | Path | Description | Use‑Case |
 |--------|------|-------------|----------|
 | `POST` | `/auth/login` | Authenticate a user and return a JWT (access + refresh tokens). | Allows a client to obtain credentials for all protected API calls. |
-| `POST` | `/api/users/register` | Register a new user (sign‑up). | Enables a new account creation; open endpoint (no auth). |
+| `POST` | `/api/users` | Register a new user (sign‑up). | Enables a new account creation; open endpoint (no auth). |
 | `GET` | `/api/users` | List all users (admin view). | Useful for administration or debugging; typically protected by admin role. |
 | `GET` | `/api/users/:id` | Retrieve a single user’s profile. | Used by the client to display the authenticated user’s details. |
 | `PUT` | `/api/users/:id` | Update a user’s information. | Allows a user (or admin) to modify profile data, e.g., email or password. |

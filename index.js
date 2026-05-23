@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,8 +26,9 @@ app.get('/swagger.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'swagger', 'swagger.json'));
 });
 
-// Mount routes – auth first (login), then protected user routes
+// Mount routes – auth first, then user profile CRUD routes
 app.use('/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 
 // Root endpoint

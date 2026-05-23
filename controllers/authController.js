@@ -1,4 +1,9 @@
-// Auth controller – handles registration and login business rules
+/*
+Auth controller business logic, step by step:
+1. Register a new user with validation, uniqueness checks, password hashing, and JWT issuance.
+2. Log a user in by validating email/password and comparing the stored password hash.
+3. Return only public user fields in auth responses so password data never leaves the API.
+*/
 
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';

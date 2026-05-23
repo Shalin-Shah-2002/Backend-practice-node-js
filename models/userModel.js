@@ -24,6 +24,13 @@ export const findUserIdByEmail = async (email) => {
   });
 };
 
+export const findUserById = async (id) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
 export const findAuthUserByEmail = async (email) => {
   const user = await prisma.user.findUnique({
     where: { email },
@@ -49,6 +56,21 @@ export const createUser = async ({ name, email, passwordHash }) => {
       email,
       password: passwordHash,
     },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
+export const updateUserById = async (id, data) => {
+  return prisma.user.update({
+    where: { id },
+    data,
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
+export const deleteUserById = async (id) => {
+  return prisma.user.delete({
+    where: { id },
     select: PUBLIC_USER_SELECT,
   });
 };
