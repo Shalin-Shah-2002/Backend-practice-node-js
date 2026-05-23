@@ -31,6 +31,13 @@ export const findUserById = async (id) => {
   });
 };
 
+export const findAllUsers = async () => {
+  return prisma.user.findMany({
+    orderBy: { id: 'asc' },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
 export const findAuthUserByEmail = async (email) => {
   const user = await prisma.user.findUnique({
     where: { email },
