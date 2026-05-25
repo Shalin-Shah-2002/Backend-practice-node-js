@@ -5,6 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import authRoutes from './routes/authRoutes.js';
+import plansRoutes from './routes/plansRoutes.js';
+import subscriptionsRoutes from './routes/subscriptionsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +14,11 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Lightweight liveness check that stays independent of auth and the database.
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 // Middleware
 app.use(bodyParser.json());
@@ -26,8 +33,10 @@ app.get('/swagger.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'swagger', 'swagger.json'));
 });
 
-// Mount routes – auth first, then user profile CRUD routes
+// Public catalog and auth routes
+app.use('/api/plans', plansRoutes);
 app.use('/auth', authRoutes);
+app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/users', userRoutes);
 
 

@@ -11,6 +11,249 @@
     }
   ],
   "paths": {
+    "/health": {
+      "get": {
+        "summary": "Check whether the API process is alive",
+        "tags": ["Health"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plans": {
+      "get": {
+        "summary": "List available subscription plans",
+        "tags": ["Plans"],
+        "responses": {
+          "200": {
+            "description": "A list of active subscription plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Plan"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plans/{id}": {
+      "get": {
+        "summary": "Get a subscription plan by id",
+        "tags": ["Plans"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested subscription plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid plan id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subscriptions": {
+      "post": {
+        "summary": "Create the current user's active subscription",
+        "tags": ["Subscriptions"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Subscription created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subscription input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User already has an active subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subscriptions/me": {
+      "get": {
+        "summary": "Get the authenticated user's active subscription",
+        "tags": ["Subscriptions"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The authenticated user's active subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "summary": "Register a new user account",
@@ -382,6 +625,106 @@
       }
     },
     "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok",
+            "description": "Liveness status of the API process"
+          }
+        }
+      },
+      "Plan": {
+        "type": "object",
+        "required": ["id", "slug", "name", "monthlyPriceCents", "apiCallLimit", "storageLimitGb"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Plan identifier"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Machine-friendly plan key"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the plan"
+          },
+          "description": {
+            "type": "string",
+            "description": "Short marketing description"
+          },
+          "monthlyPriceCents": {
+            "type": "integer",
+            "description": "Monthly price in cents"
+          },
+          "apiCallLimit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Null means unlimited API calls"
+          },
+          "storageLimitGb": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Null means unlimited storage"
+          }
+        }
+      },
+      "CreateSubscriptionRequest": {
+        "type": "object",
+        "required": ["planId"],
+        "properties": {
+          "planId": {
+            "type": "integer",
+            "description": "The plan id chosen by the current user"
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "required": ["id", "userId", "planId", "status", "startedAt", "createdAt", "updatedAt", "plan"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription identifier"
+          },
+          "userId": {
+            "type": "integer",
+            "description": "Owning user id"
+          },
+          "planId": {
+            "type": "integer",
+            "description": "Chosen plan id"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "canceled", "past_due"],
+            "description": "Current subscription state"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/Plan"
+          }
+        }
+      },
       "User": {
         "type": "object",
         "required": ["name", "email"],
@@ -485,6 +828,18 @@
     }
   },
   "tags": [
+    {
+      "name": "Health",
+      "description": "Liveness and readiness checks"
+    },
+    {
+      "name": "Plans",
+      "description": "Public subscription plan catalog"
+    },
+    {
+      "name": "Subscriptions",
+      "description": "Authenticated subscription creation"
+    },
     {
       "name": "Auth",
       "description": "Authentication endpoints for registering and logging in"
